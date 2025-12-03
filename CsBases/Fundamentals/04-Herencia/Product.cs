@@ -3,7 +3,11 @@ namespace CsBases.Fundamentals;
 public class Product : IProduct
 {
   public int Id { get; set; }
+  // Attributo personalizado para modificar el texto a mayús
+  [UpperCase]
   public string? Name { get; set; }
+  [UpperCase]
+  public string? Description { get; set; }
   public decimal Price { get; set; }
   public bool IsAvailable { get; set; }
   public DateTime CreatedAt { get; set; }

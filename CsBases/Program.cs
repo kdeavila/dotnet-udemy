@@ -1,8 +1,9 @@
-﻿using CsBases.Fundamentals;
+﻿using System.Threading.Tasks;
+using CsBases.Fundamentals;
 
 class Program
 {
-  static void Main()
+  static async Task Main()
   {
     // Instancias dos objetos de Product y Service Product
     var laptop = new Product("Laptop", 1200);
@@ -30,5 +31,13 @@ class Program
     // LabelService está siendo inyectado en ProductManager  
     manager.PrintLabel(monitor);
     manager.PrintLabel(installation);
+
+    // Métodos asíncronos con Async/Await
+    var firstProduct = await new ProductRepository().getProduct(1);
+    firstProduct.Description = "Esta es la descripción del primer producto";
+
+    // Hacemos uso del Attributo para los propiedas con [UpperCase] en Product.cs 
+    AttributeProcessor.ApplyUpperCase(firstProduct);
+    WriteLine($"{firstProduct.Name} - {firstProduct.Price} - {firstProduct.Description}");
   }
 }
