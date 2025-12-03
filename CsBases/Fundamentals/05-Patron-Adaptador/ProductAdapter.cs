@@ -1,6 +1,6 @@
 namespace CsBases.Fundamentals;
 
-public class ProductAdaptader
+public class ProductAdapter
 {
   public static ProductDto ToDto(Product product)
   {
