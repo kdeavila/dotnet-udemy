@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-namespace ApiEcommerce.Models.Dtos;
+namespace ApiEcommerce.Models;
 
 public class Category
 {

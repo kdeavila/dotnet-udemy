@@ -1,4 +1,4 @@
-using ApiEcommerce.Models.Dtos;
+using ApiEcommerce.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace ApiEcommerce.Data;
