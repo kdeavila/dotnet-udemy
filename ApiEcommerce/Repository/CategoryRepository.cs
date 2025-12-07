@@ -47,6 +47,6 @@ public class CategoryRepository : ICategoryRepository
   }
   public bool Save()
   {
-    return _db.SaveChanges() >= 0 ? true : false;
+    return _db.SaveChanges() >= 0;
   }
 }
