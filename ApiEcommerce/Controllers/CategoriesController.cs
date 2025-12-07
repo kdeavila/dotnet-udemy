@@ -1,3 +1,4 @@
+using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
 using AutoMapper;
@@ -31,7 +32,7 @@ public class CategoriesController : ControllerBase
   {
     // Obtener todas las categorías desde el repositorio.
     var categories = _categoryRepository.GetCategories();
-    
+
     var categoriesDto = new List<CategoryDto>();
 
     // Mapear cada categoría a su DTO correspondiente.
@@ -44,5 +45,53 @@ public class CategoriesController : ControllerBase
     // Retornar la lista de DTOs con un código de estado 200 OK.
     // El método Ok devuelve un objeto IActionResult con un código de estado HTTP 200 OK.
     return Ok(categoriesDto);
+  }
+
+  [HttpGet("{id:int}", Name = "GetCategory")]
+  [ProducesResponseType(StatusCodes.Status403Forbidden)]
+  [ProducesResponseType(StatusCodes.Status400BadRequest)]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
+  [ProducesResponseType(StatusCodes.Status200OK)]
+
+  public IActionResult GetCategory(int id)
+  {
+    var category = _categoryRepository.GetCategory(id);
+    if (category == null) return NotFound($"La categoría con id {id} no existe");
+
+    var categoryDto = _mapper.Map<CategoryDto>(category);
+    return Ok(categoryDto);
+  }
+
+  // Atributos que definen los posibles códigos de respuesta HTTP para esta acción
+  [HttpPost]
+  [ProducesResponseType(StatusCodes.Status201Created)]
+  [ProducesResponseType(StatusCodes.Status400BadRequest)]
+  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+  [ProducesResponseType(StatusCodes.Status403Forbidden)]
+  [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+  public IActionResult CreateCategory([FromBody] CreateCategoryDto createCategoryDto)
+  {
+    // Validación básica: si el DTO es nulo, retorna BadRequest
+    if (createCategoryDto == null) return BadRequest(ModelState);
+
+    // Chequea si la categoría ya existe para evitar duplicados
+    if (_categoryRepository.CategoryExists(createCategoryDto.Name))
+    {
+      ModelState.AddModelError("CustomError", "La categoría ya existe");
+      return BadRequest(ModelState);
+    }
+
+    // Mapea el DTO a la entidad Category usando AutoMapper
+    var category = _mapper.Map<Category>(createCategoryDto);
+
+    // Intenta crear la categoría; si falla, retorna error 500
+    if (!_categoryRepository.CreateCategory(category))
+    {
+      ModelState.AddModelError("CustomError", $"Algo salió mal guardando el registro {category.Name}");
+      return StatusCode(500, ModelState);
+    }
+
+    // Retorna 201 Created con la ruta para obtener la categoría recién creada
+    return CreatedAtRoute("GetCategory", new { id = category.Id }, category);
   }
 }
