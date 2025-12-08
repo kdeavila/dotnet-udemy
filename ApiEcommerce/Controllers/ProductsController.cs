@@ -7,7 +7,7 @@ using ApiEcommerce.Repository.IRepository;
 namespace ApiEcommerce.Controllers;
 
 [ApiController]
-[Route("api/[action]")]
+[Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
   private readonly IProductRepository _productRepository;
@@ -34,10 +34,10 @@ public class ProductsController : ControllerBase
   }
 
   [HttpGet("{id:int}", Name = "GetProduct")]
-  [ProducesResponseType(StatusCodes.Status403Forbidden)]
-  [ProducesResponseType(StatusCodes.Status400BadRequest)]
-  [ProducesResponseType(StatusCodes.Status404NotFound)]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  [ProducesResponseType(StatusCodes.Status400BadRequest)]
+  [ProducesResponseType(StatusCodes.Status403Forbidden)]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
 
   public IActionResult GetProduct(int id)
   {
@@ -84,17 +84,34 @@ public class ProductsController : ControllerBase
     return CreatedAtRoute("GetProduct", new { id = product.Id }, productDto);
   }
 
-  [HttpGet("{categoryId:int}", Name = "GetProductsForCategory")]
-  [ProducesResponseType(StatusCodes.Status403Forbidden)]
-  [ProducesResponseType(StatusCodes.Status400BadRequest)]
-  [ProducesResponseType(StatusCodes.Status404NotFound)]
+  [HttpGet("category/{categoryId:int}", Name = "GetProductsForCategory")]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  [ProducesResponseType(StatusCodes.Status400BadRequest)]
+  [ProducesResponseType(StatusCodes.Status403Forbidden)]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
 
   public IActionResult GetProductsForCategory(int categoryId)
   {
     if (!_categoryRepository.CategoryExists(categoryId)) return NotFound($"La categoría con id {categoryId} no existe");
 
     var products = _productRepository.GetProductsForCategory(categoryId);
+    var productsDto = _mapper.Map<ICollection<ProductDto>>(products);
+    return Ok(productsDto);
+  }
+
+  [HttpGet("search/{search}", Name = "SearchProducts")]
+  [ProducesResponseType(StatusCodes.Status200OK)]
+  [ProducesResponseType(StatusCodes.Status400BadRequest)]
+  [ProducesResponseType(StatusCodes.Status403Forbidden)]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
+  public IActionResult SearchProducts(string search)
+  {
+    var products = _productRepository.SearchProducts(search);
+    if (products.Count == 0)
+    {
+      return NotFound($"Productos no encontrados con el término '{search}'");
+    }
+
     var productsDto = _mapper.Map<ICollection<ProductDto>>(products);
     return Ok(productsDto);
   }

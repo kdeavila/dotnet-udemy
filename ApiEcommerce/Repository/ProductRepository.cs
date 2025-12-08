@@ -87,13 +87,18 @@ public class ProductRepository : IProductRepository
     return _db.Products.Any(p => p.Name.ToLower().Trim() == name.ToLower().Trim());
   }
 
-  public ICollection<Product> SearchProduct(string name)
+  public ICollection<Product> SearchProducts(string search)
   {
     IQueryable<Product> query = _db.Products;
+    var normalizedSearch = search.ToLower().Trim();
 
-    if (!string.IsNullOrEmpty(name))
+    if (!string.IsNullOrEmpty(search))
     {
-      query = query.Where(p => p.Name.ToLower().Trim() == name.ToLower().Trim());
+      query = query
+      .Include(p => p.Category)
+      .Where(p => p.Name.ToLower().Trim().Contains(normalizedSearch) ||
+                  p.Description.ToLower().Trim().Contains(normalizedSearch)
+      );
     }
 
     return query.OrderBy(p => p.Name).ToList();
