@@ -8,9 +8,9 @@ namespace ApiEcommerce.Repository;
 public class ProductRepository : IProductRepository
 {
   private readonly ApplicationDbContext _db;
-  private readonly CategoryRepository _categoryRepository;
+  private readonly ICategoryRepository _categoryRepository;
 
-  public ProductRepository(ApplicationDbContext db, CategoryRepository categoryRepository)
+  public ProductRepository(ApplicationDbContext db, ICategoryRepository categoryRepository)
   {
     _db = db;
     _categoryRepository = categoryRepository;
