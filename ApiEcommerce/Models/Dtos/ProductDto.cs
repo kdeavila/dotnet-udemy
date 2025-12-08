@@ -14,4 +14,7 @@ public class ProductDto
 
   // Relación con el modelo Category
   public int CategoryId { get; set; }
+
+  // Propiedad nombre de la categoría
+  public string CategoryName { get; set; } = string.Empty;
 }

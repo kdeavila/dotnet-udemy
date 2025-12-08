@@ -60,19 +60,19 @@ public class ProductRepository : IProductRepository
   public Product? GetProduct(int id)
   {
     if (id <= 0) return null;
-    return _db.Products.FirstOrDefault(p => p.Id == id);
+    return _db.Products.Include(p => p.Category).FirstOrDefault(p => p.Id == id);
   }
 
   public ICollection<Product> GetProducts()
   {
-    return _db.Products.OrderBy(p => p.Name).ToList();
+    return _db.Products.Include(p => p.Category).OrderBy(p => p.Name).ToList();
   }
 
   public ICollection<Product> GetProductsForCategory(int categoryId)
   {
     if (categoryId <= 0) return new List<Product>();
 
-    return _db.Products.Where(p => p.CategoryId == categoryId).OrderBy(p => p.Name).ToList();
+    return _db.Products.Include(p => p.Category).Where(p => p.CategoryId == categoryId).OrderBy(p => p.Name).ToList();
   }
 
   public bool ProductExists(int id)

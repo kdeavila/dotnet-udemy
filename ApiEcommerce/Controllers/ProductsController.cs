@@ -1,8 +1,8 @@
+using AutoMapper;
 using ApiEcommerce.Models;
+using Microsoft.AspNetCore.Mvc;
 using ApiEcommerce.Models.Dtos;
 using ApiEcommerce.Repository.IRepository;
-using AutoMapper;
-using Microsoft.AspNetCore.Mvc;
 
 namespace ApiEcommerce.Controllers;
 
@@ -78,6 +78,24 @@ public class ProductsController : ControllerBase
       return StatusCode(500, ModelState);
     }
 
-    return CreatedAtRoute("GetProduct", new { id = product.Id }, product);
+    var productCreated = _productRepository.GetProduct(product.Id);
+    var productDto = _mapper.Map<ProductDto>(productCreated);
+
+    return CreatedAtRoute("GetProduct", new { id = product.Id }, productDto);
+  }
+
+  [HttpGet("{categoryId:int}", Name = "GetProductsForCategory")]
+  [ProducesResponseType(StatusCodes.Status403Forbidden)]
+  [ProducesResponseType(StatusCodes.Status400BadRequest)]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
+  [ProducesResponseType(StatusCodes.Status200OK)]
+
+  public IActionResult GetProductsForCategory(int categoryId)
+  {
+    if (!_categoryRepository.CategoryExists(categoryId)) return NotFound($"La categoría con id {categoryId} no existe");
+
+    var products = _productRepository.GetProductsForCategory(categoryId);
+    var productsDto = _mapper.Map<ICollection<ProductDto>>(products);
+    return Ok(productsDto);
   }
 }
