@@ -115,4 +115,54 @@ public class ProductsController : ControllerBase
     var productsDto = _mapper.Map<ICollection<ProductDto>>(products);
     return Ok(productsDto);
   }
+
+  [HttpPatch("buy/{name}/{quantity:int}", Name = "BuyProduct")]
+  public IActionResult BuyProduct(string name, int quantity)
+  {
+    if (string.IsNullOrEmpty(name) || quantity <= 0) return BadRequest("Nombre o cantidad de producto inválidos");
+
+    var product = _productRepository.ProductExists(name);
+    if (!product) return BadRequest($"El producto con nombre '{name}' no existe");
+
+    if (!_productRepository.BuyProduct(name, quantity)) return BadRequest($"No se pudo comprar '{name}' o la cantidad de {quantity} sobrepasa el stock actual");
+
+    var units = quantity == 1 ? "unidad" : "unidades";
+    return Ok($"Compró {quantity} {units} del producto '{name}'");
+  }
+
+
+  [HttpPut("{id:int}", Name = "UpdateProduct")]
+  [ProducesResponseType(StatusCodes.Status204NoContent)]
+  [ProducesResponseType(StatusCodes.Status400BadRequest)]
+  [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+  [ProducesResponseType(StatusCodes.Status403Forbidden)]
+  [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+  public IActionResult CreateProduct(int id, [FromBody] UpdateProductDto updateProductDto)
+  {
+    if (updateProductDto == null) return BadRequest(ModelState);
+
+    if (!_productRepository.ProductExists(id))
+    {
+      ModelState.AddModelError("CustomError", $"El producto con id {id} no existe");
+      return BadRequest(ModelState);
+    }
+
+    if (!_categoryRepository.CategoryExists(updateProductDto.CategoryId))
+    {
+      ModelState.AddModelError("CustomError", $"La categoría con id {updateProductDto.CategoryId} no existe");
+      return BadRequest(ModelState);
+    }
+
+    var product = _mapper.Map<Product>(updateProductDto);
+    product.Id = id;
+
+    if (!_productRepository.UpdateProduct(product))
+    {
+      ModelState.AddModelError("CustomError", $"Algo salió mal actualizando el registro {product.Name}");
+      return StatusCode(500, ModelState);
+    }
+
+    return NoContent();
+  }
+
 }
