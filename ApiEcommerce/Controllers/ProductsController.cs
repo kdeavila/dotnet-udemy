@@ -165,4 +165,23 @@ public class ProductsController : ControllerBase
     return NoContent();
   }
 
+  [HttpDelete("{id:int}", Name = "DeleteProduct")]
+  [ProducesResponseType(StatusCodes.Status204NoContent)]
+  [ProducesResponseType(StatusCodes.Status400BadRequest)]
+  [ProducesResponseType(StatusCodes.Status403Forbidden)]
+  [ProducesResponseType(StatusCodes.Status404NotFound)]
+
+  public IActionResult DeleteProduct(int id)
+  {
+    var product = _productRepository.GetProduct(id);
+    if (product == null) return NotFound($"El producto con id {id} no existe");
+
+    if (!_productRepository.DeleteProduct(product))
+    {
+      ModelState.AddModelError("CustomError", $"Algo salió mal eliminando el registro {product.Name}");
+      return StatusCode(500, ModelState);
+    }
+
+    return NoContent();
+  }
 }
