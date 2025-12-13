@@ -1,9 +1,9 @@
-using ApiEcommerce.Models.Dtos;
+using ApiEcommerce.Models.Dtos.User;
 using ApiEcommerce.Repository.IRepository;
 using AutoMapper;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ApiEcommerce;
+namespace ApiEcommerce.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]

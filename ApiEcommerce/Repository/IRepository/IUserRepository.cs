@@ -1,5 +1,5 @@
 using ApiEcommerce.Models;
-using ApiEcommerce.Models.Dtos;
+using ApiEcommerce.Models.Dtos.User;
 
 namespace ApiEcommerce.Repository.IRepository;
 

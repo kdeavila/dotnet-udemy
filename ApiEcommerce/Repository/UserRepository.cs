@@ -3,7 +3,7 @@ using System.Security.Claims;
 using System.Text;
 using ApiEcommerce.Data;
 using ApiEcommerce.Models;
-using ApiEcommerce.Models.Dtos;
+using ApiEcommerce.Models.Dtos.User;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 

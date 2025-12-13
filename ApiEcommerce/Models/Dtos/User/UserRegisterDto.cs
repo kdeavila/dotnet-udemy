@@ -1,4 +1,4 @@
-namespace ApiEcommerce.Models.Dtos;
+namespace ApiEcommerce.Models.Dtos.User;
 
 public class UserRegisterDto
 {
