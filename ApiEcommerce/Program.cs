@@ -1,3 +1,4 @@
+using ApiEcommerce.Constants;
 using ApiEcommerce.Data;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
@@ -17,6 +18,18 @@ builder.Services.AddControllers();
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
+builder.Services.AddCors(options =>
+{
+   options.AddPolicy(PolicyNames.AllowSpecificOrigin,
+   builder =>
+   {
+      builder
+      .WithOrigins("https://localhost:3000")
+      .AllowAnyMethod()
+      .AllowAnyMethod();
+   }
+   );
+});
 
 var app = builder.Build();
 
@@ -29,6 +42,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors(PolicyNames.AllowSpecificOrigin);
 
 app.UseAuthorization();
 

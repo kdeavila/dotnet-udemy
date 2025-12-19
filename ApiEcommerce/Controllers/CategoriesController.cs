@@ -1,7 +1,9 @@
+using ApiEcommerce.Constants;
 using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos.Category;
 using ApiEcommerce.Repository.IRepository;
 using AutoMapper;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiEcommerce.Controllers;
@@ -9,6 +11,7 @@ namespace ApiEcommerce.Controllers;
 // Controlador para manejar operaciones CRUD de Categorías
 [ApiController]
 [Route("api/[controller]")]
+[EnableCors(PolicyNames.AllowSpecificOrigin)]
 public class CategoriesController : ControllerBase
 {
   private readonly ICategoryRepository _categoryRepository;
@@ -27,6 +30,11 @@ public class CategoriesController : ControllerBase
   [HttpGet]
   [ProducesResponseType(StatusCodes.Status403Forbidden)]
   [ProducesResponseType(StatusCodes.Status200OK)]
+  
+  // Podemos usar el decorador EnableCors("nombreDeLaPolitíca")
+  // Añade CORS a métodos o controladores específicos
+  // Se recomienda usar constantes para evitar errores de tipado
+  // [EnableCors("AllowSpecificOrigin")]
 
   public IActionResult GetCategories()
   {
