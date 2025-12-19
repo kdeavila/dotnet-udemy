@@ -3,12 +3,14 @@ using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos.Category;
 using ApiEcommerce.Repository.IRepository;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ApiEcommerce.Controllers;
 
 // Controlador para manejar operaciones CRUD de Categorías
+[Authorize(Roles = "Admin")]
 [ApiController]
 [Route("api/[controller]")]
 [EnableCors(PolicyNames.AllowSpecificOrigin)]
@@ -27,10 +29,12 @@ public class CategoriesController : ControllerBase
   // Método que obtiene todas las categorías disponibles
   // Usamos el decorador/atributo HttpGet para que el endpoint responda a un HTTP GET 
   // Usamos ProducesResponseType para alimentar correctamente la documentación de la API con OpenAPI y Swagger
+  // AllowAnonymous permite a cualquier usuario acceder al endpoint sin autenticarse o estar autorizado
+  [AllowAnonymous]
   [HttpGet]
   [ProducesResponseType(StatusCodes.Status403Forbidden)]
   [ProducesResponseType(StatusCodes.Status200OK)]
-  
+
   // Podemos usar el decorador EnableCors("nombreDeLaPolitíca")
   // Añade CORS a métodos o controladores específicos
   // Se recomienda usar constantes para evitar errores de tipado
@@ -55,6 +59,7 @@ public class CategoriesController : ControllerBase
     return Ok(categoriesDto);
   }
 
+  [AllowAnonymous]
   [HttpGet("{id:int}", Name = "GetCategory")]
   [ProducesResponseType(StatusCodes.Status403Forbidden)]
   [ProducesResponseType(StatusCodes.Status400BadRequest)]
