@@ -4,6 +4,7 @@ using ApiEcommerce.Data;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -13,6 +14,14 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var dbConnectionString = builder.Configuration.GetConnectionString("SqlConnection");
 builder.Services.AddDbContext<ApplicationDbContext>(options => options.UseSqlServer(dbConnectionString));
+
+builder.Services.AddResponseCaching(options =>
+{
+   // El tamaño máximo que guarda (1MB)
+   options.MaximumBodySize = 1024 * 1024;
+   options.UseCaseSensitivePaths = true;
+});
+
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -41,7 +50,11 @@ builder.Services.AddAuthentication(options =>
    };
 });
 
-builder.Services.AddControllers();
+builder.Services.AddControllers(options =>
+{
+   options.CacheProfiles.Add(CacheProfiles.Default10, CacheProfiles.Profile10);
+   options.CacheProfiles.Add(CacheProfiles.Default20, CacheProfiles.Profile20);
+});
 
 // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
 builder.Services.AddOpenApi();
@@ -93,6 +106,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors(PolicyNames.AllowSpecificOrigin);
+
+app.UseResponseCaching();
 
 app.UseAuthentication();
 app.UseAuthorization();
