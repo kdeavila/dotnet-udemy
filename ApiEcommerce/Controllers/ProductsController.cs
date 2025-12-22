@@ -4,12 +4,15 @@ using Microsoft.AspNetCore.Mvc;
 using ApiEcommerce.Models.Dtos.Product;
 using ApiEcommerce.Repository.IRepository;
 using Microsoft.AspNetCore.Authorization;
+using Asp.Versioning;
 
 namespace ApiEcommerce.Controllers;
 
+[Route("api/v{version:apiVersion}/[controller]")]
 [Authorize(Roles = "Admin")]
+[ApiVersion("1.0")]
+[ApiVersion("2.0")]
 [ApiController]
-[Route("api/[controller]")]
 public class ProductsController : ControllerBase
 {
    private readonly IProductRepository _productRepository;
@@ -121,7 +124,7 @@ public class ProductsController : ControllerBase
       var productsDto = _mapper.Map<ICollection<ProductDto>>(products);
       return Ok(productsDto);
    }
-   
+
    [HttpPatch("buy/{name}/{quantity:int}", Name = "BuyProduct")]
    public IActionResult BuyProduct(string name, int quantity)
    {

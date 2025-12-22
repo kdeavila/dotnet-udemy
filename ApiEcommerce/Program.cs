@@ -3,8 +3,8 @@ using ApiEcommerce.Constants;
 using ApiEcommerce.Data;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
+using Asp.Versioning;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
@@ -62,23 +62,69 @@ builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(
   options =>
   {
-    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-    {
-      Description = "Nuestra API utiliza la Autenticación JWT usando el esquema Bearer. \n\r\n\r" +
-                    "Ingresa la clave a continuación con token generado en login.\n\r\n\r" +
-                    "Ejemplo: \"ey12345abcde\"",
-      Name = "Authorization",
-      In = ParameterLocation.Header,
-      Type = SecuritySchemeType.Http,
-      Scheme = "Bearer",
-      BearerFormat = "JWT"
-    });
-    options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
-    {
-      [new OpenApiSecuritySchemeReference("Bearer", document)] = []
-    });
+     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+     {
+        Description = "Nuestra API utiliza la Autenticación JWT usando el esquema Bearer. \n\r\n\r" +
+                     "Ingresa la clave a continuación con token generado en login.\n\r\n\r" +
+                     "Ejemplo: \"ey12345abcde\"",
+        Name = "Authorization",
+        In = ParameterLocation.Header,
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT"
+     });
+     options.AddSecurityRequirement(document => new OpenApiSecurityRequirement
+     {
+        [new OpenApiSecuritySchemeReference("Bearer", document)] = []
+     });
+     options.SwaggerDoc("v1", new OpenApiInfo
+     {
+        Version = "v1",
+        Title = "ApiEcommerce",
+        Description = "API para gestionar productos y usuarios",
+        TermsOfService = new Uri("https://example.com/terms"),
+        Contact = new OpenApiContact
+        {
+           Name = "Keyner de Ávila",
+           Url = new Uri("https://example.com/contact"),
+        },
+        License = new OpenApiLicense
+        {
+           Name = "Licencia de uso",
+           Url = new Uri("https://example.com/license")
+        }
+     });
+     options.SwaggerDoc("v2", new OpenApiInfo
+     {
+        Version = "v2",
+        Title = "ApiEcommerce",
+        Description = "API para gestionar productos y usuarios",
+        TermsOfService = new Uri("https://example.com/terms"),
+        Contact = new OpenApiContact
+        {
+           Name = "Keyner de Ávila",
+           Url = new Uri("https://example.com/contact"),
+        },
+        License = new OpenApiLicense
+        {
+           Name = "Licencia de uso",
+           Url = new Uri("https://example.com/license")
+        }
+     });
   }
 );
+
+var apiVersioningBuilder = builder.Services.AddApiVersioning(options =>
+{
+   options.AssumeDefaultVersionWhenUnspecified = true;
+   options.DefaultApiVersion = new ApiVersion(1, 0);
+   options.ReportApiVersions = true;
+});
+apiVersioningBuilder.AddApiExplorer(options =>
+{
+   options.GroupNameFormat = "'v'VVV"; // v1,v2,v3...
+   options.SubstituteApiVersionInUrl = true; // api/v{version}/products
+});
 
 builder.Services.AddCors(options =>
 {
@@ -100,7 +146,11 @@ if (app.Environment.IsDevelopment())
 {
    app.MapOpenApi();
    app.UseSwagger();
-   app.UseSwaggerUI();
+   app.UseSwaggerUI(options =>
+   {
+      options.SwaggerEndpoint("/swagger/v1/swagger.json", "v1");
+      options.SwaggerEndpoint("/swagger/v2/swagger.json", "v2");
+   });
 }
 
 app.UseHttpsRedirection();

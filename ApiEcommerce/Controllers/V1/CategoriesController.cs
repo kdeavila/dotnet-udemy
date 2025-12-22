@@ -2,18 +2,19 @@ using ApiEcommerce.Constants;
 using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos.Category;
 using ApiEcommerce.Repository.IRepository;
+using Asp.Versioning;
 using AutoMapper;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 
-namespace ApiEcommerce.Controllers;
+namespace ApiEcommerce.Controllers.V1;
 
 // Controlador para manejar operaciones CRUD de Categorías
-[Authorize(Roles = "Admin")]
+[Route("api/v{version:apiVersion}/[controller]")]
+[ApiVersion("1.0")]
 [ApiController]
-[Route("api/[controller]")]
-[EnableCors(PolicyNames.AllowSpecificOrigin)]
+[Authorize(Roles = "Admin")]
+// [EnableCors(PolicyNames.AllowSpecificOrigin)]
 public class CategoriesController : ControllerBase
 {
    private readonly ICategoryRepository _categoryRepository;
