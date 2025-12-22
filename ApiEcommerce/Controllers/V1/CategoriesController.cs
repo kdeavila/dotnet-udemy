@@ -35,6 +35,7 @@ public class CategoriesController : ControllerBase
    [HttpGet]
    [ProducesResponseType(StatusCodes.Status403Forbidden)]
    [ProducesResponseType(StatusCodes.Status200OK)]
+   [Obsolete("Este endpoint está obsoleto. Por favor use GetCategoriesOrderById de la versión 2.0")]
 
    // Podemos usar el decorador EnableCors("nombreDeLaPolitíca")
    // Añade CORS a métodos o controladores específicos

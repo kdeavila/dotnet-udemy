@@ -10,8 +10,7 @@ namespace ApiEcommerce.Controllers;
 
 [Route("api/v{version:apiVersion}/[controller]")]
 [Authorize(Roles = "Admin")]
-[ApiVersion("1.0")]
-[ApiVersion("2.0")]
+[ApiVersionNeutral]
 [ApiController]
 public class ProductsController : ControllerBase
 {
