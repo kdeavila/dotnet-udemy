@@ -60,7 +60,7 @@ public class ProductsController : ControllerBase
    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
    [ProducesResponseType(StatusCodes.Status403Forbidden)]
    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-   public IActionResult CreateProduct([FromBody] CreateProductDto createProductDto)
+   public IActionResult CreateProduct([FromForm] CreateProductDto createProductDto)
    {
       if (createProductDto == null) return BadRequest(ModelState);
 
@@ -77,6 +77,11 @@ public class ProductsController : ControllerBase
       }
 
       var product = _mapper.Map<Product>(createProductDto);
+
+      if (createProductDto.Image != null)
+      {
+         UploadProductImage(createProductDto, product);
+      }
 
       if (!_productRepository.CreateProduct(product))
       {
@@ -145,7 +150,7 @@ public class ProductsController : ControllerBase
    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
    [ProducesResponseType(StatusCodes.Status403Forbidden)]
    [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-   public IActionResult UpdateProduct(int id, [FromBody] UpdateProductDto updateProductDto)
+   public IActionResult UpdateProduct(int id, [FromForm] UpdateProductDto updateProductDto)
    {
       if (updateProductDto == null) return BadRequest(ModelState);
 
@@ -163,6 +168,12 @@ public class ProductsController : ControllerBase
 
       var product = _mapper.Map<Product>(updateProductDto);
       product.Id = id;
+      product.UpdateDate = DateTime.Now;
+
+      // Agregar imagenes
+      product.ImageUrl = "https://placehold.co/400x300";
+
+      if (updateProductDto.Image != null) UploadProductImage(updateProductDto, product);
 
       if (!_productRepository.UpdateProduct(product))
       {
@@ -191,5 +202,25 @@ public class ProductsController : ControllerBase
       }
 
       return NoContent();
+   }
+
+   private void UploadProductImage(dynamic productDto, Product product)
+   {
+      string fileName = product.Id + Guid.NewGuid().ToString() + Path.GetExtension(productDto.Image.FileName);
+      var imagesFolder = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "ProductImages");
+
+      if (!Directory.Exists(imagesFolder)) Directory.CreateDirectory(imagesFolder);
+
+      var filePath = Path.Combine(imagesFolder, fileName);
+      FileInfo file = new FileInfo(filePath);
+
+      if (file.Exists) file.Delete();
+
+      using var fileStream = new FileStream(filePath, FileMode.Create);
+      productDto.Image.CopyTo(fileStream);
+
+      var baseUrl = $"{HttpContext.Request.Scheme}://{HttpContext.Request.Host.Value}{HttpContext.Request.PathBase.Value}";
+      product.ImageUrl = $"{baseUrl}/ProductImages/{fileName}";
+      product.ImageUrlLocal = filePath;
    }
 }

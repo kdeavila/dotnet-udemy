@@ -2,16 +2,15 @@ namespace ApiEcommerce.Models.Dtos.Product;
 
 public class UpdateProductDto
 {
-  public int Id { get; set; }
-  public string Name { get; set; } = string.Empty;
-  public string Description { get; set; } = string.Empty;
-  public decimal Price { get; set; }
-  public string ImageUrl { get; set; } = string.Empty;
-  public string SKU { get; set; } = string.Empty;
-  public int Stock { get; set; }
-  public DateTime CreationDate { get; set; } = DateTime.Now;
-  public DateTime? UpdateDate { get; set; } = null;
+   public string Name { get; set; } = string.Empty;
+   public string Description { get; set; } = string.Empty;
+   public decimal Price { get; set; }
+   public string? ImageUrl { get; set; }
+   public string? ImageUrlLocal { get; set; }
+   public IFormFile? Image { get; set; }
+   public string SKU { get; set; } = string.Empty;
+   public int Stock { get; set; }
 
-  // Relación con el modelo Category
-  public int CategoryId { get; set; }
+   // Relación con el modelo Category
+   public int CategoryId { get; set; }
 }

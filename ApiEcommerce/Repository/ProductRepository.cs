@@ -43,6 +43,11 @@ public class ProductRepository : IProductRepository
   public bool UpdateProduct(Product product)
   {
     if (product == null) return false;
+    
+    var existingProduct = _db.Products.AsNoTracking().FirstOrDefault(p => p.Id == product.Id);
+    if (existingProduct == null) return false;
+
+    product.CreationDate = existingProduct.CreationDate;
     product.UpdateDate = DateTime.Now;
 
     _db.Products.Update(product);
