@@ -2,6 +2,7 @@ using System.Text;
 using ApiEcommerce.Constants;
 using ApiEcommerce.Data;
 using ApiEcommerce.Models;
+using ApiEcommerce.Models.Dtos.Product;
 using ApiEcommerce.Repository;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
@@ -10,6 +11,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
+using Mapster;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,7 +37,10 @@ builder.Services.AddResponseCaching(options =>
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
-builder.Services.AddAutoMapper(typeof(Program).Assembly);
+
+// Configure Mapster mappings
+TypeAdapterConfig<Product, ProductDto>.NewConfig()
+    .Map(dest => dest.CategoryName, src => src.Category.Name);
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
@@ -114,16 +119,8 @@ builder.Services.AddSwaggerGen(
         Title = "ApiEcommerce",
         Description = "API para gestionar productos y usuarios",
         TermsOfService = new Uri("https://example.com/terms"),
-        Contact = new OpenApiContact
-        {
-           Name = "Keyner de Ávila",
-           Url = new Uri("https://example.com/contact"),
-        },
-        License = new OpenApiLicense
-        {
-           Name = "Licencia de uso",
-           Url = new Uri("https://example.com/license")
-        }
+        Contact = new OpenApiContact { Name = "Keyner de Ávila", Url = new Uri("https://example.com/contact") },
+        License = new OpenApiLicense { Name = "Licencia de uso", Url = new Uri("https://example.com/license") }
      });
   }
 );

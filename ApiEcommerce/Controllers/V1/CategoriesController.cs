@@ -3,7 +3,7 @@ using ApiEcommerce.Models;
 using ApiEcommerce.Models.Dtos.Category;
 using ApiEcommerce.Repository.IRepository;
 using Asp.Versioning;
-using AutoMapper;
+using Mapster;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -18,13 +18,11 @@ namespace ApiEcommerce.Controllers.V1;
 public class CategoriesController : ControllerBase
 {
    private readonly ICategoryRepository _categoryRepository;
-   private readonly IMapper _mapper;
 
    // Inyección de dependecias: repositorio de categorías y el mapper de AutoMapper
-   public CategoriesController(ICategoryRepository categoryRepository, IMapper mapper)
+   public CategoriesController(ICategoryRepository categoryRepository)
    {
       _categoryRepository = categoryRepository;
-      _mapper = mapper;
    }
 
    // Método que obtiene todas las categorías disponibles
@@ -53,7 +51,7 @@ public class CategoriesController : ControllerBase
       foreach (var category in categories)
       {
          // Utilizamos el mapper de AutoMapper para convertir cada categoría en su DTO correspondiente.
-         categoriesDto.Add(_mapper.Map<CategoryDto>(category));
+         categoriesDto.Add(category.Adapt<CategoryDto>());
       }
 
       // Retornar la lista de DTOs con un código de estado 200 OK.
@@ -77,7 +75,7 @@ public class CategoriesController : ControllerBase
 
       if (category == null) return NotFound($"La categoría con id {id} no existe");
 
-      var categoryDto = _mapper.Map<CategoryDto>(category);
+      var categoryDto = category.Adapt<CategoryDto>();
       return Ok(categoryDto);
    }
 
@@ -101,7 +99,7 @@ public class CategoriesController : ControllerBase
       }
 
       // Mapea el DTO a la entidad Category usando AutoMapper
-      var category = _mapper.Map<Category>(createCategoryDto);
+      var category = createCategoryDto.Adapt<Category>();
 
       // Intenta crear la categoría; si falla, retorna error 500
       if (!_categoryRepository.CreateCategory(category))
@@ -132,7 +130,7 @@ public class CategoriesController : ControllerBase
          return BadRequest(ModelState);
       }
 
-      var category = _mapper.Map<Category>(updateCategoryDto);
+      var category = updateCategoryDto.Adapt<Category>();
       category.Id = id;
 
       if (!_categoryRepository.UpdateCategory(category))

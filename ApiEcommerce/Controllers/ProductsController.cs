@@ -1,4 +1,4 @@
-using AutoMapper;
+using Mapster;
 using ApiEcommerce.Models;
 using Microsoft.AspNetCore.Mvc;
 using ApiEcommerce.Models.Dtos.Product;
@@ -18,13 +18,11 @@ public class ProductsController : ControllerBase
 {
    private readonly IProductRepository _productRepository;
    private readonly ICategoryRepository _categoryRepository;
-   private readonly IMapper _mapper;
 
-   public ProductsController(IProductRepository productRepository, ICategoryRepository categoryRepository, IMapper mapper)
+   public ProductsController(IProductRepository productRepository, ICategoryRepository categoryRepository)
    {
       _productRepository = productRepository;
       _categoryRepository = categoryRepository;
-      _mapper = mapper;
    }
 
    [AllowAnonymous]
@@ -35,7 +33,7 @@ public class ProductsController : ControllerBase
    public IActionResult GetProducts()
    {
       var products = _productRepository.GetProducts();
-      var productsDto = _mapper.Map<List<ProductDto>>(products);
+      var productsDto = products.Adapt<List<ProductDto>>();
 
       return Ok(productsDto);
    }
@@ -52,7 +50,7 @@ public class ProductsController : ControllerBase
       var product = _productRepository.GetProduct(id);
       if (product == null) return NotFound($"El producto con id {id} no existe");
 
-      var productDto = _mapper.Map<ProductDto>(product);
+      var productDto = product.Adapt<ProductDto>();
       return Ok(productDto);
    }
 
@@ -70,7 +68,7 @@ public class ProductsController : ControllerBase
       var totalPages = (int)Math.Ceiling((double)totalProducts / pageSize);
 
       var products = _productRepository.GetProductsInPages(pageNumber, pageSize);
-      var productsDto = _mapper.Map<ICollection<ProductDto>>(products);
+      var productsDto = products.Adapt<ICollection<ProductDto>>();
 
       if (pageNumber > totalPages) return NotFound("No hay más páginas disponibles");
 
@@ -108,7 +106,7 @@ public class ProductsController : ControllerBase
          return BadRequest(ModelState);
       }
 
-      var product = _mapper.Map<Product>(createProductDto);
+      var product = createProductDto.Adapt<Product>();
 
       if (createProductDto.Image != null)
       {
@@ -122,7 +120,7 @@ public class ProductsController : ControllerBase
       }
 
       var productCreated = _productRepository.GetProduct(product.Id);
-      var productDto = _mapper.Map<ProductDto>(productCreated);
+      var productDto = productCreated.Adapt<ProductDto>();
 
       return CreatedAtRoute("GetProduct", new { id = product.Id }, productDto);
    }
@@ -139,7 +137,7 @@ public class ProductsController : ControllerBase
       if (!_categoryRepository.CategoryExists(categoryId)) return NotFound($"La categoría con id {categoryId} no existe");
 
       var products = _productRepository.GetProductsForCategory(categoryId);
-      var productsDto = _mapper.Map<ICollection<ProductDto>>(products);
+      var productsDto = products.Adapt<ICollection<ProductDto>>();
       return Ok(productsDto);
    }
 
@@ -157,7 +155,7 @@ public class ProductsController : ControllerBase
          return NotFound($"Productos no encontrados con el término '{search}'");
       }
 
-      var productsDto = _mapper.Map<ICollection<ProductDto>>(products);
+      var productsDto = products.Adapt<ICollection<ProductDto>>();
       return Ok(productsDto);
    }
 
@@ -198,7 +196,7 @@ public class ProductsController : ControllerBase
          return BadRequest(ModelState);
       }
 
-      var product = _mapper.Map<Product>(updateProductDto);
+      var product = updateProductDto.Adapt<Product>();
       product.Id = id;
       product.UpdateDate = DateTime.Now;
 
