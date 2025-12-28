@@ -7,111 +7,125 @@ namespace ApiEcommerce.Repository;
 
 public class ProductRepository : IProductRepository
 {
-  private readonly ApplicationDbContext _db;
-  private readonly ICategoryRepository _categoryRepository;
+   private readonly ApplicationDbContext _db;
+   private readonly ICategoryRepository _categoryRepository;
 
-  public ProductRepository(ApplicationDbContext db, ICategoryRepository categoryRepository)
-  {
-    _db = db;
-    _categoryRepository = categoryRepository;
-  }
+   public ProductRepository(ApplicationDbContext db, ICategoryRepository categoryRepository)
+   {
+      _db = db;
+      _categoryRepository = categoryRepository;
+   }
 
-  public bool BuyProduct(string name, int quantity)
-  {
-    if (string.IsNullOrWhiteSpace(name) || quantity <= 0) return false;
+   public bool BuyProduct(string name, int quantity)
+   {
+      if (string.IsNullOrWhiteSpace(name) || quantity <= 0) return false;
 
-    var product = _db.Products.FirstOrDefault(p => p.Name.ToLower().Trim() == name.ToLower().Trim());
-    if (product == null || quantity > product.Stock) return false;
+      var product = _db.Products.FirstOrDefault(p => p.Name.ToLower().Trim() == name.ToLower().Trim());
+      if (product == null || quantity > product.Stock) return false;
 
-    product.Stock -= quantity;
+      product.Stock -= quantity;
 
-    _db.Products.Update(product);
-    return Save();
-  }
+      _db.Products.Update(product);
+      return Save();
+   }
 
-  public bool CreateProduct(Product product)
-  {
-    if (product == null) return false;
+   public bool CreateProduct(Product product)
+   {
+      if (product == null) return false;
 
-    product.CreationDate = DateTime.Now;
-    product.UpdateDate = DateTime.Now;
+      product.CreationDate = DateTime.Now;
+      product.UpdateDate = DateTime.Now;
 
-    _db.Products.Add(product);
-    return Save();
-  }
+      _db.Products.Add(product);
+      return Save();
+   }
 
-  public bool UpdateProduct(Product product)
-  {
-    if (product == null) return false;
-    
-    var existingProduct = _db.Products.AsNoTracking().FirstOrDefault(p => p.Id == product.Id);
-    if (existingProduct == null) return false;
+   public bool UpdateProduct(Product product)
+   {
+      if (product == null) return false;
 
-    product.CreationDate = existingProduct.CreationDate;
-    product.UpdateDate = DateTime.Now;
+      var existingProduct = _db.Products.AsNoTracking().FirstOrDefault(p => p.Id == product.Id);
+      if (existingProduct == null) return false;
 
-    _db.Products.Update(product);
-    return Save();
-  }
+      product.CreationDate = existingProduct.CreationDate;
+      product.UpdateDate = DateTime.Now;
 
-  public bool DeleteProduct(Product product)
-  {
-    if (product == null) return false;
+      _db.Products.Update(product);
+      return Save();
+   }
 
-    _db.Products.Remove(product);
-    return Save();
-  }
+   public bool DeleteProduct(Product product)
+   {
+      if (product == null) return false;
 
-  public Product? GetProduct(int id)
-  {
-    if (id <= 0) return null;
-    return _db.Products.Include(p => p.Category).FirstOrDefault(p => p.Id == id);
-  }
+      _db.Products.Remove(product);
+      return Save();
+   }
 
-  public ICollection<Product> GetProducts()
-  {
-    return _db.Products.Include(p => p.Category).OrderBy(p => p.Name).ToList();
-  }
+   public Product? GetProduct(int id)
+   {
+      if (id <= 0) return null;
+      return _db.Products.Include(p => p.Category).FirstOrDefault(p => p.Id == id);
+   }
 
-  public ICollection<Product> GetProductsForCategory(int categoryId)
-  {
-    if (categoryId <= 0) return new List<Product>();
+   public ICollection<Product> GetProducts()
+   {
+      return _db.Products.Include(p => p.Category).OrderBy(p => p.Name).ToList();
+   }
 
-    return _db.Products.Include(p => p.Category).Where(p => p.CategoryId == categoryId).OrderBy(p => p.Name).ToList();
-  }
-
-  public bool ProductExists(int id)
-  {
-    if (id <= 0) return false;
-    return _db.Products.Any(p => p.Id == id);
-  }
-
-  public bool ProductExists(string name)
-  {
-    if (string.IsNullOrWhiteSpace(name)) return false;
-    return _db.Products.Any(p => p.Name.ToLower().Trim() == name.ToLower().Trim());
-  }
-
-  public ICollection<Product> SearchProducts(string search)
-  {
-    IQueryable<Product> query = _db.Products;
-    var normalizedSearch = search.ToLower().Trim();
-
-    if (!string.IsNullOrEmpty(search))
-    {
-      query = query
+   public ICollection<Product> GetProductsInPages(int pageNumber, int pageSize)
+   {
+      return _db.Products
       .Include(p => p.Category)
-      .Where(p => p.Name.ToLower().Trim().Contains(normalizedSearch) ||
-                  p.Description.ToLower().Trim().Contains(normalizedSearch)
-      );
-    }
+      .OrderBy(p => p.Id) 
+      .Skip((pageNumber - 1) * pageSize)
+      .Take(pageSize)
+      .ToList();
+   }
+   public int GetTotalProducts()
+   {
+      return _db.Products.Count();
+   }
 
-    return query.OrderBy(p => p.Name).ToList();
-  }
+   public ICollection<Product> GetProductsForCategory(int categoryId)
+   {
+      if (categoryId <= 0) return new List<Product>();
 
-  public bool Save()
-  {
-    return _db.SaveChanges() >= 0;
-  }
+      return _db.Products.Include(p => p.Category).Where(p => p.CategoryId == categoryId).OrderBy(p => p.Name).ToList();
+   }
+
+   public bool ProductExists(int id)
+   {
+      if (id <= 0) return false;
+      return _db.Products.Any(p => p.Id == id);
+   }
+
+   public bool ProductExists(string name)
+   {
+      if (string.IsNullOrWhiteSpace(name)) return false;
+      return _db.Products.Any(p => p.Name.ToLower().Trim() == name.ToLower().Trim());
+   }
+
+   public ICollection<Product> SearchProducts(string search)
+   {
+      IQueryable<Product> query = _db.Products;
+      var normalizedSearch = search.ToLower().Trim();
+
+      if (!string.IsNullOrEmpty(search))
+      {
+         query = query
+         .Include(p => p.Category)
+         .Where(p => p.Name.ToLower().Trim().Contains(normalizedSearch) ||
+                     p.Description.ToLower().Trim().Contains(normalizedSearch)
+         );
+      }
+
+      return query.OrderBy(p => p.Name).ToList();
+   }
+
+   public bool Save()
+   {
+      return _db.SaveChanges() >= 0;
+   }
 
 }
