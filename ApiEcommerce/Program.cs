@@ -12,11 +12,17 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Mapster;
+using DotNetEnv;
+
+// Cargar variables de entorno desde .env
+Env.Load(".env");
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-var dbConnectionString = builder.Configuration.GetConnectionString("SqlConnection");
+// Leer la cadena de conexión desde variable de entorno
+var dbConnectionString = Environment.GetEnvironmentVariable("CONNECTION_STRING")
+    ?? throw new InvalidOperationException("La variable de entorno CONNECTION_STRING no está configurada");
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
    options.UseSqlServer(dbConnectionString)
@@ -46,7 +52,8 @@ builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()
 .AddDefaultTokenProviders();
 
-var secretKey = builder.Configuration.GetValue<string>("ApiSettings:SecretKey");
+var secretKey = Environment.GetEnvironmentVariable("SECRET_KEY")
+    ?? throw new InvalidOperationException("La variable de entorno SECRET_KEY no está configurada");
 if (string.IsNullOrWhiteSpace(secretKey)) throw new InvalidOperationException("La secret key no está configurada");
 
 builder.Services.AddAuthentication(options =>
