@@ -1,0 +1,5 @@
+{
+   "appService.preDeployTask": "publish-release",
+   "appService.deploySubpath": "bin\\Release\\net10.0\\publish",
+   "appService.defaultWebAppToDeploy": "/subscriptions/0b1c7834-c0a4-454f-afe2-b858105ca10e/resourceGroups/Grupo_API_Ecommerce/providers/Microsoft.Web/sites/ApiEcommerceKdeavila"
+}

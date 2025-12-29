@@ -7,7 +7,6 @@ using ApiEcommerce.Models.Dtos.User;
 using Mapster;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ApiEcommerce.Repository.IRepository;
@@ -22,7 +21,7 @@ public class UserRepository : IUserRepository
    public UserRepository(ApplicationDbContext db, IConfiguration configuration, UserManager<ApplicationUser> userManager, RoleManager<IdentityRole> roleManager)
    {
       _db = db;
-      _secretKey = configuration.GetValue<string>("ApiSettings:SecretKey");
+      _secretKey = Environment.GetEnvironmentVariable("SECRET_KEY");
       _userManager = userManager;
       _roleManager = roleManager;
    }
@@ -39,7 +38,7 @@ public class UserRepository : IUserRepository
 
    public bool IsUniqueUser(string username)
    {
-      return !_db.Users.Any(u => u.Username.ToLower().Trim() == username.ToLower().Trim());
+      return !_db.ApplicationUsers.Any(u => u.UserName != null && u.UserName.ToLower().Trim() == username.ToLower().Trim());
    }
 
    public async Task<UserLoginResponseDto> Login(UserLoginDto userLoginDto)
@@ -97,13 +96,14 @@ public class UserRepository : IUserRepository
 
       var roles = await _userManager.GetRolesAsync(user);
       var key = Encoding.UTF8.GetBytes(_secretKey);
+      var userRole = roles.FirstOrDefault() ?? "User";
       var tokenDescriptor = new SecurityTokenDescriptor()
       {
          Subject = new ClaimsIdentity(new[]
          {
             new Claim("id", user.Id.ToString()),
             new Claim("username", user.UserName ?? string.Empty),
-            new Claim(ClaimTypes.Role, roles.FirstOrDefault() ?? string.Empty),
+            new Claim(ClaimTypes.Role, userRole),
          }),
          Expires = DateTime.UtcNow.AddHours(2),
          SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
@@ -140,7 +140,6 @@ public class UserRepository : IUserRepository
          var errors = string.Join(", ", result.Errors.Select(e => e.Description));
          throw new ApplicationException($"No se pudo realizar el registro. Errores: {errors}");
       }
-
 
       var userRole = createUserDto.Role ?? "User";
       var roleExists = await _roleManager.RoleExistsAsync(userRole);

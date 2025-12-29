@@ -13,6 +13,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 using Mapster;
 using DotNetEnv;
+using ApiEcommerce.Models.Dtos.User;
 
 // Cargar variables de entorno desde .env
 Env.Load(".env");
@@ -47,6 +48,12 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 // Configure Mapster mappings
 TypeAdapterConfig<Product, ProductDto>.NewConfig()
     .Map(dest => dest.CategoryName, src => src.Category.Name);
+
+TypeAdapterConfig<ApplicationUser, UserDto>.NewConfig()
+    .Map(dest => dest.Username, src => src.UserName);
+
+TypeAdapterConfig<ApplicationUser, UserDataDto>.NewConfig()
+    .Map(dest => dest.Username, src => src.UserName);
 
 builder.Services.AddIdentity<ApplicationUser, IdentityRole>()
 .AddEntityFrameworkStores<ApplicationDbContext>()

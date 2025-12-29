@@ -59,6 +59,13 @@ public static class DataSeeder
          regularUser.PasswordHash = hasher.HashPassword(regularUser, "User123!");
 
          appContext.ApplicationUsers.AddRange(adminUser, regularUser);
+         appContext.SaveChanges();
+
+         // Asignar roles a los usuarios
+         appContext.UserRoles.AddRange(
+            new IdentityUserRole<string> { UserId = "admin-001", RoleId = "1" },
+            new IdentityUserRole<string> { UserId = "user-001", RoleId = "2" }
+         );
       }
 
       if (!appContext.Products.Any())

@@ -13,6 +13,5 @@ public class ApplicationDbContext(DbContextOptions<ApplicationDbContext> options
 
    public DbSet<Category> Categories { get; set; } = null!;
    public DbSet<Product> Products { get; set; } = null!;
-   public DbSet<User> Users { get; set; } = null!;
    public DbSet<ApplicationUser> ApplicationUsers { get; set; } = null!;
 }

@@ -69,10 +69,7 @@ public class CategoriesController : ControllerBase
 
    public IActionResult GetCategory(int id)
    {
-      Console.WriteLine($"Fetching data... {id} {DateTime.Now}");
       var category = _categoryRepository.GetCategory(id);
-      Console.WriteLine($"Fetching data... {id}");
-
       if (category == null) return NotFound($"La categoría con id {id} no existe");
 
       var categoryDto = category.Adapt<CategoryDto>();
