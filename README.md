@@ -30,7 +30,7 @@ A modern ASP.NET Core Web API for managing an e-commerce platform.
 #### Technology Stack:
 - **.NET 10.0** - Latest .NET framework
 - **Entity Framework Core 10.0** - ORM with SQL Server
-- **AutoMapper 14.0** - Object mapping
+- **Mapster 7.4.0** - Object mapping
 - **ASP.NET Core Identity** - User authentication and authorization
 - **JWT Bearer Authentication** - Token-based security
 - **API Versioning** - Version management for endpoints
@@ -38,6 +38,7 @@ A modern ASP.NET Core Web API for managing an e-commerce platform.
 - **CORS** - Cross-origin resource sharing
 - **Swagger/OpenAPI** - API documentation
 - **BCrypt.Net** - Password hashing
+- **DotNetEnv** - Environment variables management
 - **Dependency Injection** - Built-in IoC container
 
 #### Features:
@@ -62,7 +63,6 @@ ApiEcommerce/
 ├── Data/            - Database context
 ├── Models/          - Entity models
 ├── Repository/      - Data access layer
-├── Mapping/         - AutoMapper configurations
 ├── Migrations/      - EF Core migrations
 ├── Properties/      - Application settings
 └── appsettings*.json - Configuration files
@@ -241,7 +241,9 @@ dotnet test
 - Microsoft.AspNetCore.Identity.EntityFrameworkCore 10.0.0
 - Microsoft.AspNetCore.Authentication.JwtBearer 10.0.0
 - Asp.Versioning.Mvc.ApiExplorer 8.1.0
-- Swashbuckle (Swagger) 10.0.1
+- Mapster 7.4.0
+- DotNetEnv 3.1.1
+- Swashbuckle (Swagger) 10.1.0
 - OpenAPI support
 
 ---
