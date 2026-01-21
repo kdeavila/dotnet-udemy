@@ -221,13 +221,6 @@ The ApiEcommerce provides endpoints for:
 
 Detailed documentation available at `/swagger` when running in development mode.
 
-## 🧪 Testing
-
-Run tests for the entire solution:
-```bash
-dotnet test
-```
-
 ## 📦 Dependencies
 
 ### CsBases
