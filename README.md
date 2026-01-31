@@ -103,33 +103,35 @@ This will execute the fundamentals examples demonstrating:
 
 ### Running ApiEcommerce (Web API)
 
-1. **Update database connection** in `appsettings.json`:
-```json
-{
-  "ConnectionStrings": {
-    "SqlConnection": "Server=YOUR_SERVER;Database=ApiEcommerce;Trusted_Connection=true;"
-  }
-}
-```
+### Initial setup for ApiEcommerce
 
-2. **Apply database migrations:**
-```bash
-cd ApiEcommerce
-dotnet ef database update
-```
+1. **Create the `appsettings.json` file** inside the `ApiEcommerce` folder.
 
-3. **Run the API:**
-```bash
-dotnet run
-```
+2. **Create the `.env` file** inside the `ApiEcommerce` folder with the following content (example):
+  ```env
+  CONNECTION_STRING=Server=localhost;Database=ApiEcommerceDb;User Id=sa;Password=PassworHere;TrustServerCertificate=True;
+  SECRET_KEY=ThisIsASecretKeyForJwtTokenGeneration
+  ```
+  > Change the values according to your environment if needed.
 
-4. **Access Swagger UI:**
-Navigate to `https://localhost:5001/swagger` (port may vary)
+3. **Apply the database migrations:**
+  ```bash
+  cd ApiEcommerce
+  dotnet ef database update
+  ```
 
-5. **Authentication:**
-- Register a new user via `/api/v1.0/users/register`
-- Login to get JWT token via `/api/v1.0/users/login`
-- Use the token in Swagger by clicking "Authorize" button
+4. **Run the API:**
+  ```bash
+  dotnet run
+  ```
+
+5. **Access Swagger UI:**
+  Go to `https://localhost:5001/swagger` (port may vary)
+
+6. **Authentication:**
+  - Register a new user via `/api/v1.0/users/register`
+  - Log in to get the JWT token via `/api/v1.0/users/login`
+  - Use the token in Swagger by clicking the "Authorize" button
 
 ### Running with Docker
 
